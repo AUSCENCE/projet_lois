@@ -1,0 +1,1068 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "Documentation de l'API Laravel",
+        "description": "Implémentation de Swagger avec L5-Swagger.",
+        "contact": {
+            "name": "KANHONOU AUSCENCE",
+            "email": "contact@example.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://127.0.0.1:8000",
+            "description": "Serveur local de l'API"
+        }
+    ],
+    "paths": {
+        "/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Enregistre un nouvel utilisateur",
+                "operationId": "a9a0d7c459106ec536299c1c3adaad72",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur enregistré avec succès. (Retourne généralement le cookie de session Sanctum et un statut 201)."
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Connecte l'utilisateur et établit la session Sanctum (SPA)",
+                "description": "Doit être précédé d'un appel GET à /sanctum/csrf-cookie.",
+                "operationId": "2b57193c8e535e73bbdd7e4476a9321e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "remember": {
+                                        "type": "boolean",
+                                        "example": "true"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "204": {
+                        "description": "Connexion réussie."
+                    },
+                    "422": {
+                        "description": "Erreur de validation ou identifiants incorrects"
+                    }
+                }
+            }
+        },
+        "/user": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Récupère les informations de l'utilisateur authentifié",
+                "operationId": "197f1e310f5e146cd10176479932b50f",
+                "responses": {
+                    "200": {
+                        "description": "Informations de l'utilisateur",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "id": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "name": {
+                                            "type": "string",
+                                            "example": "John Doe"
+                                        },
+                                        "email": {
+                                            "type": "string",
+                                            "format": "email",
+                                            "example": "john@example.com"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Déconnecte l'utilisateur (invalide la session Sanctum)",
+                "operationId": "defd5cb91d59d9de9ae597fbc63551ff",
+                "responses": {
+                    "204": {
+                        "description": "Déconnexion réussie."
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/sanctum/csrf-cookie": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Initialise le cookie CSRF pour l'authentification SPA",
+                "description": "Endpoint obligatoire à appeler par le frontend avant toute requête d'authentification (login, register).",
+                "operationId": "90e22f7ce2d199b8ed391c45e871c24f",
+                "responses": {
+                    "204": {
+                        "description": "Cookie CSRF défini."
+                    }
+                }
+            }
+        },
+        "/api/organisme/store": {
+            "post": {
+                "tags": [
+                    "Organisme"
+                ],
+                "summary": "Crée un nouvel Organisme",
+                "operationId": "9fbab55e02324a9f50b585e2ec1ee347",
+                "requestBody": {
+                    "description": "Organisme à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Organisme"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Si( Success = true) Organisme créé avec succès   ",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Organisme"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Les données envoyées sont incorrectes"
+                    }
+                }
+            }
+        },
+        "/api/organisme/show/{organisme}": {
+            "get": {
+                "tags": [
+                    "Organisme"
+                ],
+                "summary": "Récupère un organisme",
+                "description": "Retourne l'organisme identifié par son ID.",
+                "operationId": "f6d0219032920d0e8e48cbf4993ecc48",
+                "parameters": [
+                    {
+                        "name": "organisme",
+                        "in": "path",
+                        "description": "Identifiant de l'organisme",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Organisme retourné",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Organisme"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Organisme non trouvé"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/organisme/update/{organisme}": {
+            "put": {
+                "tags": [
+                    "Organisme"
+                ],
+                "summary": "Met à jour un organisme existant",
+                "description": "Met à jour un organisme identifié par son ID.",
+                "operationId": "updateOrganisme",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/organisme--id"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données de l'organisme à mettre à jour",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Organisme"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Organisme mis à jour",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Organisme"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données invalides"
+                    },
+                    "404": {
+                        "description": "Organisme non trouvé"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/organisme/delete/{id}": {
+            "delete": {
+                "tags": [
+                    "Organisme"
+                ],
+                "summary": "Supprime un Organisme",
+                "operationId": "c982019280eb19ed858437aeda5d4cd9",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "Identifiant de l' Organisme à supprimer",
+                        "required": true,
+                        "schema": {
+                            "type": "integer"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Si (Success = true) Organisme supprimé avec succès "
+                    },
+                    "404": {
+                        "description": "Organisme non trouvé"
+                    }
+                }
+            }
+        },
+        "/api/projet": {
+            "get": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Récupère la liste des projets",
+                "description": "Retourne une liste paginée de projets, incluant les relations 'users' et 'organisme'.",
+                "operationId": "listProjets",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Numéro de page pour la pagination",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Nombre d'éléments par page",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 15
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Liste des projets récupérée avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projets"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/promuleguer": {
+            "get": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Récupère les projets promulgués",
+                "description": "Retourne la liste des projets ayant le statut promulgué.",
+                "operationId": "listProjetPromuleguer",
+                "responses": {
+                    "200": {
+                        "description": "Liste des projets promulgués",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projets"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/nonPromulegue": {
+            "get": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Récupère les projets non promulgués",
+                "description": "Retourne la liste des projets n'ayant pas le statut promulgué.",
+                "operationId": "listProjetNonPromulegue",
+                "responses": {
+                    "200": {
+                        "description": "Liste des projets non promulgués",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projets"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/avoter": {
+            "get": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Récupère les projets à voter",
+                "description": "Retourne la liste des projets en attente de vote.",
+                "operationId": "listProjetAvoter",
+                "responses": {
+                    "200": {
+                        "description": "Liste des projets à voter",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projets"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/voter/{projet_id}": {
+            "post": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Vote pour ou contre un projet",
+                "description": "Enregistre le vote d'un utilisateur sur un projet de lois.",
+                "operationId": "voterProjet",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/projet--id"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données du vote",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "vote"
+                                ],
+                                "properties": {
+                                    "vote": {
+                                        "description": "Vote de l'utilisateur (true=pour, false=contre)",
+                                        "type": "boolean",
+                                        "example": true
+                                    },
+                                    "commentaire": {
+                                        "description": "Commentaire optionnel du vote",
+                                        "type": "string",
+                                        "example": "En accord avec le projet"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Vote enregistré avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Vote enregistré avec succès"
+                                        },
+                                        "vote": {
+                                            "properties": {
+                                                "user_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "projet_id": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "vote": {
+                                                    "type": "boolean",
+                                                    "example": true
+                                                },
+                                                "commentaire": {
+                                                    "type": "string",
+                                                    "example": "En accord avec le projet"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Données de vote invalides"
+                    },
+                    "404": {
+                        "description": "Projet non trouvé"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/store": {
+            "post": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Crée un nouvel projet",
+                "description": "Crée et enregistre un nouveau projet de lois en base de données.",
+                "operationId": "storeProjet",
+                "requestBody": {
+                    "description": "Données du projet à créer",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Projet"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Projet créé avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projet"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Les données envoyées sont incorrectes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "success": {
+                                            "type": "boolean",
+                                            "example": true
+                                        },
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Projet créé avec succès"
+                                        },
+                                        "data": {
+                                            "$ref": "#/components/schemas/Projet"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/show/{projet_id}": {
+            "get": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Affiche les détails d'un projet",
+                "description": "Retourne les informations détaillées d'un projet spécifique, incluant ses utilisateurs et son organisme.",
+                "operationId": "showProjet",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/projet--id"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Détails du projet",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projet"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Projet non trouvé"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/update/{projet_id}": {
+            "put": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Met à jour un projet",
+                "description": "Met à jour les informations d'un projet existant.",
+                "operationId": "updateProjet",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/projet--id"
+                    }
+                ],
+                "requestBody": {
+                    "description": "Données du projet à mettre à jour",
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "$ref": "#/components/schemas/Projet"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Projet mis à jour avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Projet"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Les données envoyées sont incorrectes"
+                    },
+                    "404": {
+                        "description": "Projet non trouvé"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/projet/delete/{projet_id}": {
+            "delete": {
+                "tags": [
+                    "Projets"
+                ],
+                "summary": "Supprime un projet",
+                "description": "Supprime un projet de lois de la base de données.",
+                "operationId": "destroyProjet",
+                "parameters": [
+                    {
+                        "$ref": "#/components/parameters/projet--id"
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Projet supprimé avec succès"
+                    },
+                    "404": {
+                        "description": "Projet non trouvé"
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    },
+                    "403": {
+                        "description": "Accès refusé"
+                    },
+                    "500": {
+                        "description": "Erreur serveur"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/api/user/login": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Connexion d'un utilisateur",
+                "operationId": "9f6f4aca790a5229fb638e798623c6e0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Connexion effectué avec succès. "
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        },
+        "/api/user/register": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Enregistre un nouvel utilisateur",
+                "operationId": "d03ee3a44bdd6f0025efd14c5c76b5ae",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "name",
+                                    "email",
+                                    "password",
+                                    "password_confirmation"
+                                ],
+                                "properties": {
+                                    "name": {
+                                        "type": "string",
+                                        "example": "John Doe"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "john@example.com"
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "Depute"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    },
+                                    "password_confirmation": {
+                                        "type": "string",
+                                        "format": "password",
+                                        "example": "password"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Utilisateur enregistré avec succès. (Retourne généralement le cookie de session Sanctum et un statut 201)."
+                    },
+                    "422": {
+                        "description": "Erreur de validation"
+                    }
+                }
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Organisme": {
+                "title": "Organisme",
+                "required": [],
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "Identifiant de l'Organisme",
+                        "type": "integer",
+                        "readOnly": "true",
+                        "example": 1
+                    },
+                    "name": {
+                        "title": "name",
+                        "description": "Nom de l'Organisme",
+                        "type": "string",
+                        "example": "Présidence"
+                    }
+                },
+                "type": "object"
+            },
+            "Organismes": {
+                "title": "Organismes",
+                "properties": {
+                    "data": {
+                        "title": "data",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Organisme"
+                        }
+                    }
+                },
+                "type": "object"
+            },
+            "Projet": {
+                "title": "Projet",
+                "required": [
+                    "title",
+                    "filePath"
+                ],
+                "properties": {
+                    "id": {
+                        "title": "id",
+                        "description": "Identifiant du projet de lois",
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "title": {
+                        "title": "title",
+                        "description": "Titre du projet de lois",
+                        "type": "string",
+                        "example": "Loi de finances 2025"
+                    },
+                    "filePath": {
+                        "title": "filePath",
+                        "description": "Chemin du fichier du projet de lois",
+                        "type": "string",
+                        "example": "/files/projet_1.pdf"
+                    },
+                    "etat": {
+                        "title": "etat",
+                        "description": "État du projet (en_cours, promulgue, etc)",
+                        "type": "string",
+                        "example": "en_cours"
+                    },
+                    "avoter": {
+                        "title": "avoter",
+                        "description": "Indique si le projet est à voter",
+                        "type": "boolean",
+                        "example": true
+                    },
+                    "cloturevoter": {
+                        "title": "cloturevoter",
+                        "description": "Date de clôture du vote",
+                        "type": "string",
+                        "example": "2025-12-31T23:59:59Z",
+                        "nullable": true
+                    },
+                    "organisme_id": {
+                        "title": "organisme_id",
+                        "description": "Identifiant de l'organisme responsable",
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "created_at": {
+                        "title": "created_at",
+                        "description": "Date de création",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2025-01-01T12:00:00Z"
+                    },
+                    "updated_at": {
+                        "title": "updated_at",
+                        "description": "Date de mise à jour",
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true,
+                        "example": "2025-01-02T12:00:00Z"
+                    }
+                },
+                "type": "object"
+            },
+            "Projets": {
+                "title": "Projets",
+                "properties": {
+                    "data": {
+                        "title": "data",
+                        "type": "array",
+                        "items": {
+                            "$ref": "#/components/schemas/Projet"
+                        }
+                    }
+                },
+                "type": "object"
+            }
+        },
+        "parameters": {
+            "organisme--id": {
+                "name": "organisme_id",
+                "in": "path",
+                "description": "Identifiant de organisme",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": "1"
+                }
+            },
+            "projet--id": {
+                "name": "projet_id",
+                "in": "path",
+                "description": "Identifiant de projet",
+                "required": true,
+                "schema": {
+                    "type": "integer",
+                    "example": 1
+                }
+            }
+        },
+        "securitySchemes": {
+            "sanctum": {
+                "type": "http",
+                "bearerFormat": "Bearer",
+                "scheme": "bearer"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Authentication",
+            "description": "Opérations d'authentification (Register, Login, Logout, Profil)"
+        },
+        {
+            "name": "Organisme",
+            "description": "Organisme"
+        },
+        {
+            "name": "Projets",
+            "description": "Projets"
+        }
+    ]
+}
