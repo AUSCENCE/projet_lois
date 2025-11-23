@@ -1,39 +1,53 @@
-name: PHP Composer
+name: 🚀 Auto Deploy Laravel on LWS
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
-
-permissions:
-  contents: read
+    branches:
+      - main   # 👉 lancement automatique à chaque push sur main
 
 jobs:
-  build:
-
+  deploy:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v4
+    # 1) Récupération du code
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-    - name: Validate composer.json and composer.lock
-      run: composer validate --strict
-
-    - name: Cache Composer packages
-      id: composer-cache
-      uses: actions/cache@v3
+    # 2) Installation de PHP 8.3
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
       with:
-        path: vendor
-        key: ${{ runner.os }}-php-${{ hashFiles('**/composer.lock') }}
-        restore-keys: |
-          ${{ runner.os }}-php-
+        php-version: '8.3'
+        extensions: mbstring, pdo, mysql, tokenizer, curl, xml
 
-    - name: Install dependencies
-      run: composer install --prefer-dist --no-progress
+    # 3) Installation des dépendances Laravel
+    - name: Install composer dependencies
+      run: composer install --no-dev --prefer-dist --optimize-autoloader
 
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
+    # 4) Optimisations Laravel
+    - name: Laravel optimization
+      run: |
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache || true
 
-    # - name: Run test suite
-    #   run: composer run-script test
+    # 5) Déploiement sur LWS via FTP
+    - name: 📦 Deploy via FTP to LWS
+      uses: SamKirkland/FTP-Deploy-Action@v4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        port: 21
+        protocol: ftp
+        server-dir: ${{ secrets.FTP_PATH }}
+        local-dir: "./"
+        exclude: |
+          **/.git*
+          **/.github*
+          **/node_modules/**
+          **/tests/**
+          docker/**
+          storage/framework/views/*
+          storage/logs/*
