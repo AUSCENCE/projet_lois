@@ -12,7 +12,7 @@ Route::middleware(['auth:sanctum'])->group(function(){
             Route::post('/voter','voter')->name('projet.voter');
             Route::post('/store','store')->name('projet.store');
             Route::get('/show/{projet}','show')->name('projet.show');
-            Route::put('/update/{projet}','update')->name('projet.update');
+            Route::post('/update/{projet}','update')->name('projet.update');
             Route::delete('/delete/{projet}', 'destroy')->name('projet.destroy');
         });
     });

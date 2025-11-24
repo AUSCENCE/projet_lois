@@ -13,6 +13,8 @@ use App\Models\Projet;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
+use function PHPUnit\Framework\returnSelf;
+
 class ProjetController extends Controller
 {
      /**
@@ -73,7 +75,7 @@ class ProjetController extends Controller
    
     public function promulegue()
     {
-        CrudToolsProjet::projetPromulguer();
+      return  CrudToolsProjet::projetPromulguer();
     }
      /**
      * @OA\Get(
@@ -94,7 +96,7 @@ class ProjetController extends Controller
      */
     public function nonPromulegue()
     {
-        CrudToolsProjet::projetNonPromulegue();
+      return  CrudToolsProjet::projetNonPromulegue();
     }
     
     /**
@@ -116,7 +118,7 @@ class ProjetController extends Controller
      */
     public function Avoter()
     {
-        CrudToolsProjet::projetAvoter();
+       return CrudToolsProjet::projetAvoter();
     }
 
     /**
@@ -158,10 +160,10 @@ class ProjetController extends Controller
     *     security={{"bearerAuth":{}}}
     * )
     */
-    public function voter(Projet $projet, Request $request)
+    public function voter(Request $request, Projet $projet)
     {
         $data = $request->all();
-        CrudToolsProjet::voter($projet, $data );
+        return CrudToolsProjet::voter($projet, $data );
     }
 
     
@@ -230,13 +232,8 @@ class ProjetController extends Controller
         }
 
         // 💾 Enregistrement en base
-        $projet = CrudToolsProjet::saveOrUpdate($data, null, Projet::class);
+        return CrudToolsProjet::saveOrUpdate($data, null, Projet::class);
 
-        return ApiResponseTools::format(
-            'Projet créé avec succès !',
-            $projet,
-            true
-        );
     }
 
 
@@ -262,7 +259,8 @@ class ProjetController extends Controller
      */
     public function show(Projet $projet)
     {
-        CrudToolsProjet::show($projet,Projet::class,['organisme']);
+
+       return ApiResponseTools::format('Projet trouvé', $projet->load(['organisme']));
     }
 
     /**
@@ -299,9 +297,23 @@ class ProjetController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
-     public function update(UpdateProjetRequest $request, Projet $projet)
+     public function update(Request $request, Projet $projet)
     {
-        CrudToolsProjet::saveOrUpdate($request->all(),$projet,Projet::class);
+        return response()->json([$request->all(),$projet]);
+
+        $validator = Validator::make($request->all(), [
+            'title'        => 'nulllable|string|unique:projets,title,'.$projet->id,
+            'filePath' => 'nullable|file|mimes:pdf|max:50240',
+            'organisme_id' => 'nulllable|exists:organismes,id'
+        ]);
+         if ($validator->fails()) {
+            return ApiResponseTools::format(
+                DefaultMessageTools::fieldValidation(),
+                (array) $validator->errors()->messages(),
+                false
+            );
+        }
+        return CrudToolsProjet::saveOrUpdate($request->all(),$projet,Projet::class);
 
     }
 
@@ -324,9 +336,8 @@ class ProjetController extends Controller
      *     security={{"bearerAuth":{}}}
      * )
      */
-
     public function destroy(Projet $projet)
     {
-        CrudToolsProjet::deleteItem(Projet::class, $projet->id);
+        return CrudToolsProjet::deleteItem(Projet::class, $projet->id);
     }
 }

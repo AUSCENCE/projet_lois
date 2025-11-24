@@ -18,7 +18,7 @@ class OrganismeController extends Controller
      */
     public function index(){
         //
-        return CrudTools::list(Organisme::class, ['users']);
+        return CrudTools::list(Organisme::class, ['user']);
     }
 
     /**
@@ -98,7 +98,7 @@ class OrganismeController extends Controller
     public function show(Organisme $organisme)
     {
         //
-        return CrudTools::searchById(Organisme::class, $organisme->id);
+        return ApiResponseTools::format('Organisme trouvé',$organisme);
     }
 
     /**
@@ -129,14 +129,16 @@ class OrganismeController extends Controller
      *   @OA\Response(response=404,description="Organisme non trouvé")
      * )
      *
-     * @param UpdateOrganismeRequest $request
+     * @param Request $request
      * @param Organisme $organisme
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\Routing\ResponseFactory|\Illuminate\Http\Response
      */
     public function update(Request $request, Organisme $organisme)
     {
         //
-          $validator = Validator::make($request->all(),[
+        return response()->json([$request->all(),$organisme]);
+
+        $validator = Validator::make($request->all(),[
             'name'=>"required|string|unique:organismes,name"
         ]);
         if ($validator->fails()) {
@@ -155,6 +157,7 @@ class OrganismeController extends Controller
      * @OA\Delete(
      *     path="/api/organisme/delete/{id}",
      *     tags={"Organisme"},
+     *     security={{"sanctum":{}}},
      *     summary="Supprime un Organisme",
      *     @OA\Parameter(
      *         name="id",
@@ -176,15 +179,12 @@ class OrganismeController extends Controller
     public function destroy(Organisme $organisme)
     {
         //
-        if ($organisme->users()->exist()) {
-            return ApiResponseTools::format('Cet organisme à un ou plusieurs utilisateur enrégistré. Vous ne pouvez pas le supprimé.',null,false,400);
-        }
-
-        if ($organisme->projets()->exist()) {
+     
+        if (!$organisme->projets) {
             return ApiResponseTools::format('Cet organisme à un ou plusieurs projet de lois enrégistré. Vous ne pouvez pas le supprimé.',null,false,400);
         }
 
-        CrudTools::deleteItem(Organisme::class,$organisme->id);
+        return CrudTools::deleteItem(Organisme::class,$organisme->id);
 
     }
 }
