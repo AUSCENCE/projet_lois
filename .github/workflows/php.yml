@@ -1,0 +1,53 @@
+name: 🚀 Auto Deploy Laravel on LWS
+
+on:
+  push:
+    branches:
+      - main   # 👉 lancement automatique à chaque push sur main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+    # 1) Récupération du code
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    # 2) Installation de PHP 8.3
+    - name: Setup PHP
+      uses: shivammathur/setup-php@v2
+      with:
+        php-version: '8.3'
+        extensions: mbstring, pdo, mysql, tokenizer, curl, xml
+
+    # 3) Installation des dépendances Laravel
+    - name: Install composer dependencies
+      run: composer install --no-dev --prefer-dist --optimize-autoloader
+
+    # 4) Optimisations Laravel
+    - name: Laravel optimization
+      run: |
+        php artisan config:cache
+        php artisan route:cache
+        php artisan view:cache || true
+
+    # 5) Déploiement sur LWS via FTP
+    - name: 📦 Deploy via FTP to LWS
+      uses: SamKirkland/FTP-Deploy-Action@v4
+      with:
+        server: ${{ secrets.FTP_HOST }}
+        username: ${{ secrets.FTP_USERNAME }}
+        password: ${{ secrets.FTP_PASSWORD }}
+        port: 21
+        protocol: ftp
+        server-dir: ${{ secrets.FTP_PATH }}
+        local-dir: "./"
+        exclude: |
+          **/.git*
+          **/.github*
+          **/node_modules/**
+          **/tests/**
+          docker/**
+          storage/framework/views/*
+          storage/logs/*
