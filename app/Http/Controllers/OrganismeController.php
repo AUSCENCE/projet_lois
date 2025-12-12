@@ -16,6 +16,21 @@ class OrganismeController extends Controller
     /**
      * Display a listing of the resource.
      */
+    /**
+     * @OA\Get(
+     *     path="/api/organisme",
+     *     tags={"Organisme"},
+     *     summary="Récupère la liste des organismes",
+     *     description="Retourne la liste de tous les organismes.",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Liste des organismes",
+     *         @OA\JsonContent(ref="#/components/schemas/Organisme")
+     *     ),
+     *     @OA\Response(response=401, description="Non autorisé")
+     * )
+     */
     public function index(){
         //
         return CrudTools::list(Organisme::class, ['user']);
@@ -135,11 +150,8 @@ class OrganismeController extends Controller
      */
     public function update(Request $request, Organisme $organisme)
     {
-        //
-        return response()->json([$request->all(),$organisme]);
-
         $validator = Validator::make($request->all(),[
-            'name'=>"required|string|unique:organismes,name"
+            'name'=>"required|string|unique:organismes,name,".$organisme->id
         ]);
         if ($validator->fails()) {
             return ApiResponseTools::format(
@@ -180,8 +192,8 @@ class OrganismeController extends Controller
     {
         //
      
-        if (!$organisme->projets) {
-            return ApiResponseTools::format('Cet organisme à un ou plusieurs projet de lois enrégistré. Vous ne pouvez pas le supprimé.',null,false,400);
+        if ($organisme->projets()->count() > 0) {
+            return ApiResponseTools::format('Cet organisme a un ou plusieurs projets enregistrés. Vous ne pouvez pas le supprimer.',null,false,400);
         }
 
         return CrudTools::deleteItem(Organisme::class,$organisme->id);

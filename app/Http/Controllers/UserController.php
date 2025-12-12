@@ -97,6 +97,22 @@ class UserController extends Controller
 
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/user/logout",
+     *     tags={"Authentication"},
+     *     summary="Déconnexion de l'utilisateur",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Déconnexion réussie",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="message", type="string", example="Logged out")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+     */
     public function logout(Request $request)
     {
         $request->user()->currentAccessToken()->delete();
@@ -106,11 +122,42 @@ class UserController extends Controller
         ]);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/user/me",
+     *     tags={"Authentication"},
+     *     summary="Récupérer l'utilisateur connecté",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Informations de l'utilisateur connecté",
+     *         @OA\JsonContent(ref="#/components/schemas/User")
+     *     ),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+     */
     public function user()
     {
         return  ApiResponseTools::format('Utilisateur connecté !',Auth::user());
     }
 
+    /**
+     * @OA\Post(
+     *     path="/api/user/refresh",
+     *     tags={"Authentication"},
+     *     summary="Rafraîchir le token d'authentification",
+     *     security={{"sanctum":{}}},
+     *     @OA\Response(
+     *         response=200,
+     *         description="Token rafraîchi avec succès",
+     *         @OA\JsonContent(
+     *             @OA\Property(property="token", type="string", example="1|laravel_sanctum_token..."),
+     *             @OA\Property(property="user", ref="#/components/schemas/User")
+     *         )
+     *     ),
+     *     @OA\Response(response=401, description="Non authentifié")
+     * )
+     */
     public function refresh_token(Request $request)
     {
         try {

@@ -16,6 +16,36 @@
         }
     ],
     "paths": {
+        "/api/organisme": {
+            "get": {
+                "tags": [
+                    "Organisme"
+                ],
+                "summary": "Récupère la liste des organismes",
+                "description": "Retourne la liste de tous les organismes.",
+                "operationId": "a368a142deb6541c31d32bacbc23a8f3",
+                "responses": {
+                    "200": {
+                        "description": "Liste des organismes",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Organisme"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non autorisé"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
         "/api/organisme/store": {
             "post": {
                 "tags": [
@@ -166,7 +196,12 @@
                     "404": {
                         "description": "Organisme non trouvé"
                     }
-                }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         },
         "/api/projet": {
@@ -222,7 +257,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -255,7 +290,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -288,7 +323,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -321,7 +356,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -418,7 +453,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -432,12 +467,37 @@
                 "description": "Crée et enregistre un nouveau projet de lois en base de données.",
                 "operationId": "storeProjet",
                 "requestBody": {
-                    "description": "Données du projet à créer",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Projet"
+                                "required": [
+                                    "title",
+                                    "organisme_id"
+                                ],
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "organisme_id": {
+                                        "type": "integer"
+                                    },
+                                    "filePath": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "etat": {
+                                        "type": "string"
+                                    },
+                                    "avoter": {
+                                        "type": "boolean"
+                                    },
+                                    "cloturevoter": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
@@ -479,7 +539,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -520,13 +580,13 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
         },
         "/api/projet/update/{projet_id}": {
-            "put": {
+            "post": {
                 "tags": [
                     "Projets"
                 ],
@@ -539,12 +599,33 @@
                     }
                 ],
                 "requestBody": {
-                    "description": "Données du projet à mettre à jour",
                     "required": true,
                     "content": {
-                        "application/json": {
+                        "multipart/form-data": {
                             "schema": {
-                                "$ref": "#/components/schemas/Projet"
+                                "properties": {
+                                    "title": {
+                                        "type": "string"
+                                    },
+                                    "organisme_id": {
+                                        "type": "integer"
+                                    },
+                                    "filePath": {
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "etat": {
+                                        "type": "string"
+                                    },
+                                    "avoter": {
+                                        "type": "boolean"
+                                    },
+                                    "cloturevoter": {
+                                        "type": "string",
+                                        "format": "date-time"
+                                    }
+                                },
+                                "type": "object"
                             }
                         }
                     }
@@ -575,7 +656,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -612,7 +693,7 @@
                 },
                 "security": [
                     {
-                        "bearerAuth": []
+                        "sanctum": []
                     }
                 ]
             }
@@ -716,6 +797,108 @@
                         "description": "Erreur de validation"
                     }
                 }
+            }
+        },
+        "/api/user/logout": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Déconnexion de l'utilisateur",
+                "operationId": "d52b7004aad9cc11ac927b616ad9c1f2",
+                "responses": {
+                    "200": {
+                        "description": "Déconnexion réussie",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Logged out"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/me": {
+            "get": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Récupérer l'utilisateur connecté",
+                "operationId": "6fe027ed3122aca3a0e9da76cb468aaa",
+                "responses": {
+                    "200": {
+                        "description": "Informations de l'utilisateur connecté",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
+            }
+        },
+        "/api/user/refresh": {
+            "post": {
+                "tags": [
+                    "Authentication"
+                ],
+                "summary": "Rafraîchir le token d'authentification",
+                "operationId": "5d44e5e23a8b2f80d64df12a365551c2",
+                "responses": {
+                    "200": {
+                        "description": "Token rafraîchi avec succès",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "token": {
+                                            "type": "string",
+                                            "example": "1|laravel_sanctum_token..."
+                                        },
+                                        "user": {
+                                            "$ref": "#/components/schemas/User"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Non authentifié"
+                    }
+                },
+                "security": [
+                    {
+                        "sanctum": []
+                    }
+                ]
             }
         }
     },
@@ -833,6 +1016,50 @@
                         "items": {
                             "$ref": "#/components/schemas/Projet"
                         }
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "User",
+                "required": [
+                    "name",
+                    "email"
+                ],
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "readOnly": true,
+                        "example": 1
+                    },
+                    "name": {
+                        "type": "string",
+                        "example": "John Doe"
+                    },
+                    "email": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "john@example.com"
+                    },
+                    "role": {
+                        "type": "string",
+                        "example": "Depute",
+                        "nullable": true
+                    },
+                    "email_verified_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "nullable": true
+                    },
+                    "created_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
+                    },
+                    "updated_at": {
+                        "type": "string",
+                        "format": "date-time",
+                        "readOnly": true
                     }
                 },
                 "type": "object"

@@ -18,6 +18,8 @@ class OrganismeFactory extends Factory
     {
         return [
             'name' => fake()->name(),
+            'createdBy' => 1,
+            'updatedBy' => null,
         ];
     }
 }

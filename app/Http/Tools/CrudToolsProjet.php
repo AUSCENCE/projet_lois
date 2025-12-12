@@ -153,9 +153,9 @@ class CrudToolsProjet
         try {
             $item = $model::find($id);
             if ($item)
-                return ApiResponseTools::format(DefaultMessageTools::echecRecherche(), null, false);
-            else
                 return ApiResponseTools::format(DefaultMessageTools::succesRecherche(), $item);
+            else
+                return ApiResponseTools::format(DefaultMessageTools::echecRecherche(), null, false);
         } catch (\Exception $exception) {
             return ApiResponseTools::devFormat(env('APP_DEBUG'), DefaultMessageTools::exceptionError(), $exception);
         }
@@ -226,7 +226,7 @@ class CrudToolsProjet
     public static function projetPromulguer($perPage = 50){
         try {
             $listes = Projet::with(['organisme'])
-                    ->where('etat',true)
+                    ->where('etat', 'promulgue')
                     ->paginate($perPage);
             return ApiResponseTools::format(DefaultMessageTools::listeMessage(), $listes);
         } catch (\Exception $exception) {
@@ -244,9 +244,7 @@ class CrudToolsProjet
     public static function projetNonPromulegue($perPage = 50){
         try {
             $liste = Projet::with(['organisme'])
-                    ->where('avoter',true)
-                    ->where('etat',false)
-                    ->where('cloturevoter','<=',now()->format('Y-m-d'))
+                    ->where('etat', '!=', 'promulgue')
                     ->paginate($perPage);
             return ApiResponseTools::format(DefaultMessageTools::listeMessage(), $liste);
         } catch (\Exception $exception) {
@@ -290,9 +288,9 @@ class CrudToolsProjet
 
             $requestDatas['user_id'] = Auth::user()->id;
 
-            $validator = Validator::make($requestDatas->all(), [
+            $validator = Validator::make($requestDatas, [
                 'vote' => 'required|boolean',
-                'commentaire' => 'required|string',
+                'commentaire' => 'nullable|string',
                 'user_id' => 'required|integer|exists:users,id',
             ]);
 
@@ -300,7 +298,15 @@ class CrudToolsProjet
                 return ApiResponseTools::format(DefaultMessageTools::fieldValidation(), (array) $validator->errors()->messages(), false);
             }
 
-            $projet->users()->sync($requestDatas);
+            // Vérifier si l'utilisateur a déjà voté
+            if ($projet->users()->where('user_id', $requestDatas['user_id'])->exists()) {
+                return ApiResponseTools::format('Vous avez déjà voté pour ce projet.', null, false, 400);
+            }
+
+            $projet->users()->attach($requestDatas['user_id'], [
+                'vote' => $requestDatas['vote'],
+                'commentaire' => $requestDatas['commentaire'] ?? null
+            ]);
             
             return ApiResponseTools::format(DefaultMessageTools::successSave());
 

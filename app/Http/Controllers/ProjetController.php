@@ -46,7 +46,7 @@ class ProjetController extends Controller
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=403, description="Accès refusé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *    security={{"bearerAuth":{}},}
+     *    security={{"sanctum":{}},}
      * )
      */
     public function index()
@@ -69,7 +69,7 @@ class ProjetController extends Controller
      *     ),
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
    
@@ -91,7 +91,7 @@ class ProjetController extends Controller
      *     ),
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
     public function nonPromulegue()
@@ -113,7 +113,7 @@ class ProjetController extends Controller
      *     ),
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
     public function Avoter()
@@ -157,7 +157,7 @@ class ProjetController extends Controller
     *     @OA\Response(response=404, description="Projet non trouvé"),
     *     @OA\Response(response=401, description="Non autorisé"),
     *     @OA\Response(response=500, description="Erreur serveur"),
-    *     security={{"bearerAuth":{}}}
+    *     security={{"sanctum":{}}}
     * )
     */
     public function voter(Request $request, Projet $projet)
@@ -175,9 +175,19 @@ class ProjetController extends Controller
      *     summary="Crée un nouvel projet",
      *     description="Crée et enregistre un nouveau projet de lois en base de données.",
      *     @OA\RequestBody(
-     *         description="Données du projet à créer",
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Projet")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 required={"title", "organisme_id"},
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="organisme_id", type="integer"),
+     *                 @OA\Property(property="filePath", type="string", format="binary"),
+     *                 @OA\Property(property="etat", type="string"),
+     *                 @OA\Property(property="avoter", type="boolean"),
+     *                 @OA\Property(property="cloturevoter", type="string", format="date-time")
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=201,
@@ -194,7 +204,7 @@ class ProjetController extends Controller
      *             @OA\Property(property="data", ref="#/components/schemas/Projet")
      *         )
      *     ),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
     */
     public function store(Request $request)
@@ -226,7 +236,7 @@ class ProjetController extends Controller
         if ($request->hasFile('filePath')) {
             $data['filePath'] = FunctionTools::copyFileToStorage(
                 $request->file('filePath'),
-                'Projet',
+                'Public/Projet',
                 $request->title
             );
         }
@@ -254,7 +264,7 @@ class ProjetController extends Controller
      *     @OA\Response(response=404, description="Projet non trouvé"),
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
     public function show(Projet $projet)
@@ -273,7 +283,7 @@ class ProjetController extends Controller
 
    
     /**
-     * @OA\Put(
+     * @OA\Post(
      *     path="/api/projet/update/{projet_id}",
      *     operationId="updateProjet",
      *     tags={"Projets"},
@@ -281,9 +291,18 @@ class ProjetController extends Controller
      *     description="Met à jour les informations d'un projet existant.",
      *     @OA\Parameter(ref="#/components/parameters/projet--id"),
      *     @OA\RequestBody(
-     *         description="Données du projet à mettre à jour",
      *         required=true,
-     *         @OA\JsonContent(ref="#/components/schemas/Projet")
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="title", type="string"),
+     *                 @OA\Property(property="organisme_id", type="integer"),
+     *                 @OA\Property(property="filePath", type="string", format="binary"),
+     *                 @OA\Property(property="etat", type="string"),
+     *                 @OA\Property(property="avoter", type="boolean"),
+     *                 @OA\Property(property="cloturevoter", type="string", format="date-time")
+     *             )
+     *         )
      *     ),
      *     @OA\Response(
      *         response=200,
@@ -294,17 +313,17 @@ class ProjetController extends Controller
      *     @OA\Response(response=404, description="Projet non trouvé"),
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
      public function update(Request $request, Projet $projet)
     {
-        return response()->json([$request->all(),$projet]);
+        //return response()->json([$request->all(),$projet]);
 
         $validator = Validator::make($request->all(), [
-            'title'        => 'nulllable|string|unique:projets,title,'.$projet->id,
+            'title'        => 'nullable|string|unique:projets,title,'.$projet->id,
             'filePath' => 'nullable|file|mimes:pdf|max:50240',
-            'organisme_id' => 'nulllable|exists:organismes,id'
+            'organisme_id' => 'nullable|exists:organismes,id'
         ]);
          if ($validator->fails()) {
             return ApiResponseTools::format(
@@ -333,7 +352,7 @@ class ProjetController extends Controller
      *     @OA\Response(response=401, description="Non autorisé"),
      *     @OA\Response(response=403, description="Accès refusé"),
      *     @OA\Response(response=500, description="Erreur serveur"),
-     *     security={{"bearerAuth":{}}}
+     *     security={{"sanctum":{}}}
      * )
      */
     public function destroy(Projet $projet)

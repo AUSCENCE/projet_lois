@@ -149,9 +149,9 @@ class CrudTools
         try {
             $item = $model::find($id);
             if ($item)
-                return ApiResponseTools::format(DefaultMessageTools::echecRecherche(), null, false);
-            else
                 return ApiResponseTools::format(DefaultMessageTools::succesRecherche(), $item);
+            else
+                return ApiResponseTools::format(DefaultMessageTools::echecRecherche(), null, false);
         } catch (\Exception $exception) {
             return ApiResponseTools::devFormat(env('APP_DEBUG'), DefaultMessageTools::exceptionError(), $exception);
         }
