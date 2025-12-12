@@ -19,6 +19,8 @@
 /storage/*.key
 /storage/pail
 /vendor
+# Ignorer le fichier de documentation généré par L5-Swagger
+/storage/api-docs/api-docs.json
 Homestead.json
 Homestead.yaml
 Thumbs.db
