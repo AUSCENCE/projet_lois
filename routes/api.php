@@ -9,6 +9,4 @@ require __DIR__.'/api/organisme.php';
 require __DIR__.'/api/projet.php';
 
 
-Route::middleware(['auth:sanctum'])->get('/user', function (Request $request) {
-    return $request->user();
-});
+

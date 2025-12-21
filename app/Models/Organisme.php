@@ -26,7 +26,7 @@ use Illuminate\Database\Eloquent\Model;
  * @OA\Parameter(
  *      parameter="organisme--id",
  *      in="path",
- *      name="organisme_id",
+ *      name="organisme",
  *      required=true,
  *      description="Identifiant de organisme",
  *      @OA\Schema(

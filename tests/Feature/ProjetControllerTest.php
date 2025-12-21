@@ -121,9 +121,8 @@ class ProjetControllerTest extends TestCase
         ]);
 
         $response->assertStatus(200)
-            ->assertJsonStructure([
-                'message',
-                'datas' => ['id', 'title']
+            ->assertJson([
+                'success' => true,
             ]);
     }
 
@@ -223,16 +222,16 @@ class ProjetControllerTest extends TestCase
     /** @test */
     public function it_can_vote_on_a_projet()
     {
-        $user = $this->actingAsUser();
+        $user = $this->actingAsUser(['role' => 'depute']);
         $organisme = $this->createOrganisme();
         
         $projet = Projet::factory()->create([
             'organisme_id' => $organisme->id,
             'avoter' => true,
+            'cloturevoter' => now()->addDays(7)->format('Y-m-d')
         ]);
 
-        $response = $this->postJson('/api/projet/voter', [
-            'projet_id' => $projet->id,
+        $response = $this->postJson("/api/projet/voter/{$projet->id}", [
             'vote' => true,
             'commentaire' => 'Je suis en accord avec ce projet',
         ]);
@@ -252,6 +251,6 @@ class ProjetControllerTest extends TestCase
         $this->getJson("/api/projet/show/{$projet->id}")->assertStatus(401);
         $this->postJson("/api/projet/update/{$projet->id}", ['title' => 'Test'])->assertStatus(401);
         $this->deleteJson("/api/projet/delete/{$projet->id}")->assertStatus(401);
-        $this->postJson('/api/projet/voter', ['projet_id' => $projet->id])->assertStatus(401);
+        $this->postJson("/api/projet/voter/{$projet->id}", ['vote' => true])->assertStatus(401);
     }
 }

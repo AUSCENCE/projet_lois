@@ -54,6 +54,40 @@ class ProjetController extends Controller
         return CrudToolsProjet::list(Projet::class,['organisme']);
     }
 
+    /**
+     * @OA\Get(
+     *     path="/api/projet/changeEtat/{projet}",
+     *     operationId="changeEtatProjet",
+     *     tags={"Projets"},
+     *     summary="Change l'état d'un projet",
+     *     description="Change l'état d'un projet (avoter ou promulgué).",
+     *     @OA\Parameter(ref="#/components/parameters/projet--id"),
+     *     @OA\Response(
+     *         response=200,
+     *         description="Etat du projet modifié avec succès",
+     *         @OA\JsonContent(ref="#/components/schemas/Projet")
+     *     ),
+     *     @OA\Response(response=401, description="Non autorisé"),
+     *     @OA\Response(response=403, description="Accès refusé"),
+     *     @OA\Response(response=500, description="Erreur serveur"),
+     *     security={{"sanctum":{}}}
+     * )
+     */
+    public function changeEtat(Projet $projet)
+    {
+        if (auth()->user()->role !== 'admin') {
+            return ApiResponseTools::format('Accès refusé. Seuls les administrateurs peuvent changer l\'état.', null, false, 403);
+        }
+
+        if($projet->etat == 'promulguer'){
+            return ApiResponseTools::format('Le projet est déjà promulgué',$projet);
+        }
+
+        $projet->avoter = $projet->avoter == true ? false : true;
+        $projet->save();
+        return ApiResponseTools::format('Etat du projet modifié avec succès ',$projet);
+    }
+
    
     /**
      * @OA\Get(
@@ -123,7 +157,7 @@ class ProjetController extends Controller
 
     /**
     * @OA\Post(
-    *     path="/api/projet/voter/{projet_id}",
+    *     path="/api/projet/voter/{projet}",
     *     operationId="voterProjet",
     *     tags={"Projets"},
     *     summary="Vote pour ou contre un projet",
@@ -162,6 +196,10 @@ class ProjetController extends Controller
     */
     public function voter(Request $request, Projet $projet)
     {
+        if (auth()->user()->role !== 'depute') {
+            return ApiResponseTools::format('Accès refusé. Seuls les députés peuvent voter.', null, false, 403);
+        }
+
         $data = $request->all();
         return CrudToolsProjet::voter($projet, $data );
     }
@@ -192,16 +230,21 @@ class ProjetController extends Controller
      *     @OA\Response(
      *         response=201,
      *         description="Projet créé avec succès",
-     *         @OA\JsonContent(ref="#/components/schemas/Projet")
+     *         @OA\JsonContent(
+     *             type="object",
+     *             @OA\Property(property="success", type="boolean", example=true),
+     *             @OA\Property(property="message", type="string", example="Projet créé avec succès"),
+     *             @OA\Property(property="data", ref="#/components/schemas/Projet")
+     *         )
      *     ),
      *     @OA\Response(
      *         response=400,
      *         description="Les données envoyées sont incorrectes",
      *         @OA\JsonContent(
      *             type="object",
-     *             @OA\Property(property="success", type="boolean", example=true),
-     *             @OA\Property(property="message", type="string", example="Projet créé avec succès"),
-     *             @OA\Property(property="data", ref="#/components/schemas/Projet")
+     *             @OA\Property(property="success", type="boolean", example=false),
+     *             @OA\Property(property="message", type="string", example="Erreur de validation"),
+     *             @OA\Property(property="data", type="object")
      *         )
      *     ),
      *     security={{"sanctum":{}}}
@@ -250,7 +293,7 @@ class ProjetController extends Controller
    
     /**
      * @OA\Get(
-     *     path="/api/projet/show/{projet_id}",
+     *     path="/api/projet/show/{projet}",
      *     operationId="showProjet",
      *     tags={"Projets"},
      *     summary="Affiche les détails d'un projet",
@@ -284,7 +327,7 @@ class ProjetController extends Controller
    
     /**
      * @OA\Post(
-     *     path="/api/projet/update/{projet_id}",
+     *     path="/api/projet/update/{projet}",
      *     operationId="updateProjet",
      *     tags={"Projets"},
      *     summary="Met à jour un projet",
@@ -338,7 +381,7 @@ class ProjetController extends Controller
 
      /**
      * @OA\Delete(
-     *     path="/api/projet/delete/{projet_id}",
+     *     path="/api/projet/delete/{projet}",
      *     operationId="destroyProjet",
      *     tags={"Projets"},
      *     summary="Supprime un projet",
@@ -357,6 +400,10 @@ class ProjetController extends Controller
      */
     public function destroy(Projet $projet)
     {
+        if (auth()->user()->role !== 'admin') {
+            return ApiResponseTools::format('Accès refusé. Seuls les administrateurs peuvent supprimer un projet.', null, false, 403);
+        }
+
         return CrudToolsProjet::deleteItem(Projet::class, $projet->id);
     }
 }

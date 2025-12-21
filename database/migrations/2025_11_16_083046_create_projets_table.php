@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('projets', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('filePath');
+            $table->string('filePath')->nullable();
             $table->boolean('etat')->default(false);
             $table->boolean('avoter')->default(false);
             $table->date('cloturevoter')->nullable();

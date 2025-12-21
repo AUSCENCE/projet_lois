@@ -297,9 +297,22 @@ class CrudToolsProjet
             if ($validator->fails()) {
                 return ApiResponseTools::format(DefaultMessageTools::fieldValidation(), (array) $validator->errors()->messages(), false);
             }
+            // Vérifier si le projet est en attente de vote
+            if (!$projet->avoter) {
+                return ApiResponseTools::format('Le projet n\'est pas en attente de vote.', null, false, 400);
+            }
+            
+            // Vérifier si tous les députés ont voté
+            if ($projet->users()->count() == User::where('role', 'depute')->count()) {
+                $projet->avoter = false;
+                $projet->etat = true;
+                $projet->save();
+                return ApiResponseTools::format('Tous les députés ont voté.');
+            }
 
             // Vérifier si l'utilisateur a déjà voté
             if ($projet->users()->where('user_id', $requestDatas['user_id'])->exists()) {
+                
                 return ApiResponseTools::format('Vous avez déjà voté pour ce projet.', null, false, 400);
             }
 
@@ -307,7 +320,13 @@ class CrudToolsProjet
                 'vote' => $requestDatas['vote'],
                 'commentaire' => $requestDatas['commentaire'] ?? null
             ]);
-            
+           
+                
+            // Si le nombre de vote pour le projet est supérieur à 50% des députés, promulguer le projet
+            if ($projet->users()->where('vote', true)->count() >= User::where('role', 'depute')->count() / 2) {
+                $projet->etat = true;
+                $projet->save();
+            }
             return ApiResponseTools::format(DefaultMessageTools::successSave());
 
         } catch (\Exception $exception) {

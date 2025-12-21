@@ -167,17 +167,11 @@ class OrganismeController extends Controller
     
     /**
      * @OA\Delete(
-     *     path="/api/organisme/delete/{id}",
+     *     path="/api/organisme/delete/{organisme}",
      *     tags={"Organisme"},
      *     security={{"sanctum":{}}},
      *     summary="Supprime un Organisme",
-     *     @OA\Parameter(
-     *         name="id",
-     *         in="path",
-     *         required=true,
-     *         description="Identifiant de l' Organisme à supprimer",
-     *         @OA\Schema(type="integer")
-     *     ),
+     *     @OA\Parameter(ref="#/components/parameters/organisme--id"),
      *     @OA\Response(
      *         response=200,
      *         description="Si (Success = true) Organisme supprimé avec succès "

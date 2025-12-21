@@ -65,8 +65,7 @@ class User extends Authenticatable
 
     public function projets()
     {
-        return $this->belongsToMany(Projet::class, 'user_projet','projet_id','user_id')
-                    ->pivot('vote','commentaire')
-                    ->timestamp();
+        return $this->belongsToMany(Projet::class, 'user_projet', 'user_id', 'projet_id')
+                    ->withPivot('vote', 'commentaire');
     }
 }

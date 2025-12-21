@@ -32,7 +32,7 @@ use Illuminate\Database\Eloquent\Model;
 * @OA\Parameter(
 *   parameter="projet--id",
 *   in="path",
-*   name="projet_id",
+*   name="projet",
 *   required=true,
 *   description="Identifiant de projet",
 *   @OA\Schema(type="integer", example=1)
@@ -42,13 +42,12 @@ class Projet extends Model
 {
     /** @use HasFactory<\Database\Factories\ProjetFactory> */
     use HasFactory;
-    protected $fillable = ['id','title','filePath', 'etat','avoter','cloturevoter', 'organisme_id','createdBy','updatedBy'];
+    protected $fillable = ['id','title','filePath', 'etat','    ','cloturevoter', 'organisme_id','createdBy','updatedBy'];
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_projets','user_id','projet_id')
-                    ->pivot('vote','commentaire')
-                    ->timestamp();
+        return $this->belongsToMany(User::class, 'user_projet', 'projet_id', 'user_id')
+                    ->withPivot('vote', 'commentaire');
     }
 
     public function organisme(){

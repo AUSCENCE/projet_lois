@@ -14,6 +14,12 @@ Route::prefix('user')->group(function(){
             Route::get('/me','user')->name('user.user');
             Route::post('/logout', 'logout')->name('user.logout');
             Route::post('/refresh', 'refresh_token')->name('user.refresh');
+            
+            Route::get('/', 'index')->name('user.index');
+            Route::post('/', 'store')->name('user.store');
+            Route::get('/{user}', 'show')->name('user.show');
+            Route::put('/{user}/role', 'updateRole')->name('user.updateRole');
+            Route::delete('/{user}', 'destroy')->name('user.destroy');
         });
     });
 });
